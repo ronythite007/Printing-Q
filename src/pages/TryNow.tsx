@@ -96,8 +96,20 @@ const initialSettings: PrintSettings = {
   sides: "Single-sided",
 };
 
+const backendBaseUrl = () => {
+  if (typeof window === "undefined") return "http://127.0.0.1:3001";
+  if (window.location.protocol === "file:" || !window.location.host) return "http://127.0.0.1:3001";
+  return "";
+};
+
+const apiUrl = (path: string) => {
+  const base = backendBaseUrl();
+  return base ? `${base}${path}` : path;
+};
+
 const wsUrl = () => {
-  if (typeof window === "undefined") return "ws://localhost:8080/ws";
+  const base = backendBaseUrl();
+  if (base) return `${base.replace(/^http/, "ws")}/ws`;
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
   return `${protocol}//${window.location.host}/ws`;
 };
@@ -150,7 +162,7 @@ export default function TryNow() {
 
     const loadSnapshot = async () => {
       try {
-        const response = await fetch("/api/snapshot", { signal: controller.signal });
+        const response = await fetch(apiUrl("/api/snapshot"), { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`Snapshot failed (${response.status})`);
         }
@@ -269,7 +281,7 @@ export default function TryNow() {
       throw new Error(`Missing documentId/fileName/filePath for: ${list}`);
     }
 
-    const response = await fetch("/api/queue", {
+    const response = await fetch(apiUrl("/api/queue"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ documents: docsPayload }),
@@ -295,7 +307,7 @@ export default function TryNow() {
     setResetting(true);
     setError(null);
     try {
-      const response = await fetch("/api/whatsapp/reset", { method: "POST" });
+      const response = await fetch(apiUrl("/api/whatsapp/reset"), { method: "POST" });
       if (!response.ok) {
         throw new Error(`Reset failed (${response.status})`);
       }

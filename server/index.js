@@ -42,7 +42,7 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server, path: "/ws" });
 
-const rootDir = process.cwd();
+const rootDir = process.env.SMARTPRINT_ROOT_DIR || process.cwd();
 const stateDir = path.join(rootDir, "server-state");
 const downloadsDir = path.join(rootDir, "downloads");
 const convertedDir = path.join(downloadsDir, "converted");
