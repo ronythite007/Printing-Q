@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Paper cream + deep ink + electric cyan industrial-tech palette */
+    --background: 40 30% 96%;
+    --foreground: 220 25% 8%;
+
+    --card: 40 25% 98%;
+    --card-foreground: 220 25% 8%;
+
+    --popover: 40 25% 98%;
+    --popover-foreground: 220 25% 8%;
+
+    --primary: 220 25% 8%;
+    --primary-foreground: 40 30% 96%;
+
+    --secondary: 40 20% 90%;
+    --secondary-foreground: 220 25% 8%;
+
+    --muted: 40 15% 88%;
+    --muted-foreground: 220 10% 40%;
+
+    --accent: 186 100% 45%;
+    --accent-foreground: 220 25% 8%;
+
+    --neon: 186 100% 50%;
+    --neon-glow: 186 100% 60%;
+    --signal: 12 100% 58%;
+    --paper: 40 30% 96%;
+    --ink: 220 25% 8%;
+
+    --destructive: 0 84% 55%;
+    --destructive-foreground: 40 30% 96%;
+
+    --success: 145 65% 42%;
+    --warning: 38 95% 55%;
+
+    --border: 220 15% 85%;
+    --input: 220 15% 85%;
+    --ring: 186 100% 45%;
+
+    --radius: 0.25rem;
+
+    --gradient-ink: linear-gradient(135deg, hsl(220 25% 8%) 0%, hsl(220 30% 14%) 100%);
+    --gradient-neon: linear-gradient(135deg, hsl(186 100% 50%) 0%, hsl(200 100% 55%) 100%);
+    --gradient-paper: linear-gradient(180deg, hsl(40 30% 96%) 0%, hsl(40 20% 92%) 100%);
+
+    --shadow-brutal: 6px 6px 0 hsl(220 25% 8%);
+    --shadow-brutal-sm: 3px 3px 0 hsl(220 25% 8%);
+    --shadow-neon: 0 0 30px hsl(186 100% 50% / 0.4);
+    --shadow-soft: 0 10px 40px -10px hsl(220 25% 8% / 0.15);
+
+    --transition-snap: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-feature-settings: 'ss01', 'cv01';
+  }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+}
+
+@layer utilities {
+  .grid-paper {
+    background-image:
+      linear-gradient(hsl(220 25% 8% / 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(220 25% 8% / 0.04) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .text-balance { text-wrap: balance; }
+  .shadow-brutal { box-shadow: var(--shadow-brutal); }
+  .shadow-brutal-sm { box-shadow: var(--shadow-brutal-sm); }
+  .shadow-neon { box-shadow: var(--shadow-neon); }
+  @keyframes scan {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+  .animate-scan { animation: scan 2.5s linear infinite; }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .animate-blink { animation: blink 1.2s ease-in-out infinite; }
+  @keyframes feed {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(110%); }
+  }
+  .animate-feed { animation: feed 2s ease-in-out infinite; }
+  @keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .animate-ticker { animation: ticker 30s linear infinite; }
+}
