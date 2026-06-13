@@ -164,8 +164,8 @@ function categoryFromMime(mimeType = "", fileName = "") {
   const lowerMime = mimeType.toLowerCase();
   const lowerName = fileName.toLowerCase();
   if (lowerMime.includes("pdf") || lowerName.endsWith(".pdf")) return "pdfs";
-  if (lowerMime.startsWith("image/")) return "images";
-  if (lowerMime.startsWith("text/") || lowerName.endsWith(".txt") || lowerName.endsWith(".csv") || lowerName.endsWith(".json")) return "texts";
+  if (lowerMime.startsWith("image/") || lowerName.endsWith(".png") || lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg") || lowerName.endsWith(".gif") || lowerName.endsWith(".bmp") || lowerName.endsWith(".tiff") || lowerName.endsWith(".tif")) return "images";
+  if (lowerMime.startsWith("text/") || lowerName.endsWith(".txt") || lowerName.endsWith(".csv") || lowerName.endsWith(".json") || lowerName.endsWith(".md")) return "texts";
   return "others";
 }
 
@@ -177,6 +177,17 @@ function inferExtension(mimeType = "", fileName = "") {
   if (mimeType.includes("png")) return ".png";
   if (mimeType.includes("text/plain")) return ".txt";
   return "";
+}
+
+function isPrintableMedia(message, media) {
+  const mimeType = (media.mimetype || "").toLowerCase();
+  const fileName = path.basename(media.filename || "");
+  const extension = path.extname(fileName).toLowerCase();
+  if (mimeType.includes("pdf") || extension === ".pdf") return true;
+  if (mimeType.startsWith("image/") || [".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tiff", ".tif"].includes(extension)) return true;
+  if (mimeType.startsWith("text/") || [".txt", ".csv", ".json", ".md"].includes(extension)) return true;
+  if (mimeType.includes("word") || extension === ".doc" || extension === ".docx" || extension === ".ppt" || extension === ".pptx" || extension === ".xls" || extension === ".xlsx") return true;
+  return false;
 }
 
 function safeName(value) {
@@ -340,6 +351,7 @@ async function connectWhatsApp() {
 
       const media = await message.downloadMedia();
       if (!media?.data) return;
+      if (!isPrintableMedia(message, media)) return;
 
       const document = makeDocumentPayload(message, media);
       state.documents = [document, ...state.documents].slice(0, 100);
