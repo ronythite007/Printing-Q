@@ -147,13 +147,16 @@ export default function TryNow() {
   const failedJobs = queue.filter((job) => job.stage === "failed");
 
   const selectedSummary = useMemo(() => {
-    const first = selectedDocs[0];
-    if (!first) return null;
+    if (selectedDocs.length === 0) return null;
+    const senderSet = Array.from(new Set(selectedDocs.map((doc) => doc.sender || "Unknown sender")));
     return {
-      fileName: first.fileName,
-      sender: first.sender,
-      timestamp: first.timestamp,
-      messageText: first.messageText || "No instructions sent.",
+      fileName: selectedDocs[0].fileName,
+      sender: senderSet.length === 1 ? senderSet[0] : `${senderSet.length} senders`,
+      timestamp: selectedDocs[0].timestamp,
+      messageText:
+        selectedDocs.length === 1
+          ? selectedDocs[0].messageText || "No instructions sent."
+          : "Multiple documents selected.",
     };
   }, [selectedDocs]);
 
