@@ -5,19 +5,59 @@ export function resolveBrowserExecutablePath() {
   const candidates = [
     process.env.PUPPETEER_EXECUTABLE_PATH,
     process.env.CHROME_PATH,
-    "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-    "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
-    "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
-    "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
   ].filter(Boolean) as string[];
+
+  if (process.platform === "win32") {
+    candidates.push(
+      "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
+      "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
+    );
+  } else if (process.platform === "linux") {
+    candidates.push(
+      "/usr/bin/google-chrome-stable",
+      "/usr/bin/google-chrome",
+      "/usr/bin/chromium",
+      "/usr/bin/chromium-browser",
+      "/snap/bin/chromium"
+    );
+  } else if (process.platform === "darwin") {
+    candidates.push(
+      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+      "/Applications/Chromium.app/Contents/MacOS/Chromium"
+    );
+  }
 
   for (const candidate of candidates) {
     if (fs.existsSync(candidate)) return candidate;
   }
 
+  const puppeteerChrome = findPuppeteerCachedChrome();
+  if (puppeteerChrome) return puppeteerChrome;
+
   throw new Error(
     "Could not find Chrome or Edge. Install Google Chrome, or set PUPPETEER_EXECUTABLE_PATH to a valid browser executable."
   );
+}
+
+function findPuppeteerCachedChrome(): string | null {
+  const cacheDir = path.join(process.env.HOME || "", ".cache", "puppeteer", "chrome");
+  if (!fs.existsSync(cacheDir)) return null;
+
+  const versions = fs
+    .readdirSync(cacheDir)
+    .filter((name) => name.startsWith("linux-") || name.startsWith("mac-") || name.startsWith("win"))
+    .sort()
+    .reverse();
+
+  for (const version of versions) {
+    const chromePath = path.join(cacheDir, version, "chrome-linux64", "chrome");
+    if (fs.existsSync(chromePath)) return chromePath;
+  }
+
+  return null;
 }
 
 export function resolveSofficePath() {

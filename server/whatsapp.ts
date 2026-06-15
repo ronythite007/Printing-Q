@@ -8,6 +8,14 @@ import { resolveBrowserExecutablePath, isPrintableMedia, removeDirWithRetries } 
 
 const { Client, LocalAuth } = pkg as any;
 
+// tsx/esbuild adds __name() to serialized Puppeteer callbacks; WhatsApp Web has no such helper.
+const PUPPETEER_NAME_POLYFILL = `globalThis.__name = (target, value) => {
+  try {
+    Object.defineProperty(target, "name", { value, configurable: true });
+  } catch {}
+  return target;
+};`;
+
 let whatsappClient: any = null;
 let browserExecutablePath: string | null = null;
 
@@ -22,6 +30,7 @@ export async function initializeWhatsAppClient() {
 
   const client = new Client({
     authStrategy: new LocalAuth({ dataPath: whatsappSessionDir }),
+    evalOnNewDoc: PUPPETEER_NAME_POLYFILL,
     puppeteer: {
       headless: true,
       executablePath: browserExecutablePath,
